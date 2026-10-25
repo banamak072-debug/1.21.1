@@ -1,0 +1,53 @@
+name: Build Epic Fight Fabric
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.10.2
+
+      # Build tetap dilanjutkan walau gagal, supaya log error selalu bisa diunduh
+      - name: Build
+        id: build
+        continue-on-error: true
+        run: gradle build --no-daemon --console=plain 2>&1 | tee build.log
+
+      - name: Ringkas error kompilasi
+        if: always()
+        run: |
+          echo "## Ringkasan error" >> $GITHUB_STEP_SUMMARY
+          echo "Jumlah error: $(grep -c 'error:' build.log || true)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          grep -E 'error:' build.log | head -60 >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Unggah log build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+
+      - name: Unggah jar mod
+        if: steps.build.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: epicfight-fabric-jar
+          path: build/libs/*.jar
+
+      - name: Gagalkan job jika build gagal
+        if: steps.build.outcome != 'success'
+        run: exit 1
