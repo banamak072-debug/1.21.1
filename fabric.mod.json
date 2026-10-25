@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "epicfight",
+  "version": "${version}",
+  "name": "Epic Fight (Fabric Port)",
+  "description": "Port tidak resmi dari Epic Fight (NeoForge 1.21.1) ke Fabric. Fokus: sistem combat.",
+  "authors": ["Port: pengguna", "Asli: Yesman, Gui, Asan, Wayfarer (squoshi), Fori, Ellet"],
+  "contact": { "sources": "https://github.com/Epic-Fight/epicfight" },
+  "license": "GPL-3.0-or-later",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["yesman.epicfight.fabric.EpicFightFabric"]
+  },
+  "mixins": ["epicfight.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
